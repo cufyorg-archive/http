@@ -929,6 +929,7 @@
           <option value="JUnitTestMethodWithNoAssertions" />
           <option value="NakedNotify" />
           <option value="EmptyClass" />
+          <option value="NullableProblems" />
         </list>
       </option>
     </inspection_tool>

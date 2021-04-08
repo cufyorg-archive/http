@@ -253,12 +253,14 @@ public class AbstractXClient<B extends Body> extends AbstractClient<B> implement
 	@NotNull
 	@Override
 	public XClient<B> trigger(@Nullable Object parameter, @Nullable String @NotNull ... triggers) {
+		//noinspection NullableProblems
 		return (XClient<B>) super.trigger(parameter, triggers);
 	}
 
 	@NotNull
 	@Override
 	public <T> XClient<B> trigger(@Nullable T parameter, @Nullable Action<T> @NotNull ... actions) {
+		//noinspection NullableProblems
 		return (XClient<B>) super.trigger(parameter, actions);
 	}
 }

@@ -25,6 +25,7 @@ import org.cufy.http.connect.Caller;
 import org.cufy.http.connect.Client;
 import org.cufy.http.middleware.Middleware;
 import org.cufy.http.request.Request;
+import org.cufy.http.sink.Sink;
 import org.cufy.http.syntax.HTTPRegExp;
 import org.intellij.lang.annotations.Language;
 import org.intellij.lang.annotations.Pattern;
@@ -166,6 +167,12 @@ public interface XClient<B extends Body> extends Client<B> {
 
 	@NotNull
 	@Override
+	default XClient<B> connect(Sink sink) {
+		return (XClient<B>) Client.super.connect(sink);
+	}
+
+	@NotNull
+	@Override
 	default XClient<B> on(@NotNull @NonNls String regex, @NotNull Callback<Client<B>, Object> callback) {
 		return (XClient<B>) Client.super.on(regex, callback);
 	}
@@ -178,7 +185,8 @@ public interface XClient<B extends Body> extends Client<B> {
 
 	@NotNull
 	@Override
-	default <T> XClient<B> on(@NotNull Callback<Client<B>, T> callback, @Nullable @NotNull Action<T>... actions) {
+	default <T> XClient<B> on(@NotNull Callback<Client<B>, T> callback, @Nullable Action<T> @NotNull ... actions) {
+		//noinspection NullableProblems
 		return (XClient<B>) Client.super.on(callback, actions);
 	}
 
@@ -202,7 +210,8 @@ public interface XClient<B extends Body> extends Client<B> {
 
 	@NotNull
 	@Override
-	default <T> XClient<B> ont(@NotNull Callback<Client<B>, T> callback, @Nullable @NotNull Action<T>... actions) {
+	default <T> XClient<B> ont(@NotNull Callback<Client<B>, T> callback, @Nullable Action<T> @NotNull ... actions) {
+		//noinspection NullableProblems
 		return (XClient<B>) Client.super.ont(callback, actions);
 	}
 
@@ -222,6 +231,32 @@ public interface XClient<B extends Body> extends Client<B> {
 	@Override
 	default XClient<Body> request(@NotNull @NonNls @Pattern(HTTPRegExp.REQUEST) String request) {
 		return (XClient<Body>) Client.super.request(request);
+	}
+
+	@NotNull
+	@Override
+	default <T> XClient<B> trigger(@NotNull Sink sink, @NotNull Action<T> action, @Nullable T parameter) {
+		return (XClient<B>) Client.super.trigger(sink, action, parameter);
+	}
+
+	@NotNull
+	@Override
+	default XClient<B> trigger(@NotNull Sink sink, @NotNull @NonNls String trigger, @Nullable Object parameter) {
+		return (XClient<B>) Client.super.trigger(sink, trigger, parameter);
+	}
+
+	@NotNull
+	@Override
+	default <T> XClient<B> trigger(@NotNull Sink sink, @Nullable T parameter, @Nullable Action<T> @NotNull ... actions) {
+		//noinspection NullableProblems
+		return (XClient<B>) Client.super.trigger(sink, parameter, actions);
+	}
+
+	@NotNull
+	@Override
+	default XClient<B> trigger(@NotNull Sink sink, @Nullable Object parameter, @Nullable @NonNls String @NotNull ... triggers) {
+		//noinspection NullableProblems
+		return (XClient<B>) Client.super.trigger(sink, parameter, triggers);
 	}
 
 	/**
@@ -423,7 +458,7 @@ public interface XClient<B extends Body> extends Client<B> {
 	 */
 	@NotNull
 	@Contract(value = "_,_->this", mutates = "this")
-	default <T> XClient<B> onh(@NotNull Callback<XClient<B>, T> callback, @Nullable @NotNull Action<T>... actions) {
+	default <T> XClient<B> onh(@NotNull Callback<XClient<B>, T> callback, @Nullable Action<T> @NotNull ... actions) {
 		Objects.requireNonNull(callback, "callback");
 		Objects.requireNonNull(actions, "actions");
 		for (Action<T> action : actions)
