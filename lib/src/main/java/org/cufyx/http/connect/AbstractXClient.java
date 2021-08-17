@@ -99,8 +99,8 @@ public class AbstractXClient<B extends Body> extends AbstractClient<B> implement
 	 */
 	public AbstractXClient(@NotNull XClient<?> client) {
 		super(client);
-		this.context = client.context();
-		this.handler = client.handler();
+		this.context = client.getContext();
+		this.handler = client.getHandler();
 	}
 
 	/**
@@ -187,29 +187,13 @@ public class AbstractXClient<B extends Body> extends AbstractClient<B> implement
 
 	@NotNull
 	@Override
-	public XClient<B> context(@NotNull Context context) {
-		Objects.requireNonNull(context, "context");
-		this.context = context;
-		return this;
-	}
-
-	@NotNull
-	@Override
-	public Context context() {
+	public Context getContext() {
 		return this.context;
 	}
 
-	@Override
-	@NotNull
-	public XClient<B> handler(@NotNull Handler handler) {
-		Objects.requireNonNull(handler, "handler");
-		this.handler = handler;
-		return this;
-	}
-
 	@NotNull
 	@Override
-	public Handler handler() {
+	public Handler getHandler() {
 		return this.handler;
 	}
 
@@ -227,8 +211,24 @@ public class AbstractXClient<B extends Body> extends AbstractClient<B> implement
 
 	@NotNull
 	@Override
-	public <BB extends Body> XClient<BB> request(@NotNull Request<BB> request) {
-		return (XClient<BB>) super.request(request);
+	public XClient<B> setContext(@NotNull Context context) {
+		Objects.requireNonNull(context, "context");
+		this.context = context;
+		return this;
+	}
+
+	@Override
+	@NotNull
+	public XClient<B> setHandler(@NotNull Handler handler) {
+		Objects.requireNonNull(handler, "handler");
+		this.handler = handler;
+		return this;
+	}
+
+	@NotNull
+	@Override
+	public <BB extends Body> XClient<BB> setRequest(@NotNull Request<BB> request) {
+		return (XClient<BB>) super.setRequest(request);
 	}
 
 	@NotNull
@@ -253,14 +253,12 @@ public class AbstractXClient<B extends Body> extends AbstractClient<B> implement
 	@NotNull
 	@Override
 	public XClient<B> trigger(@Nullable Object parameter, @Nullable String @NotNull ... triggers) {
-		//noinspection NullableProblems
 		return (XClient<B>) super.trigger(parameter, triggers);
 	}
 
 	@NotNull
 	@Override
 	public <T> XClient<B> trigger(@Nullable T parameter, @Nullable Action<T> @NotNull ... actions) {
-		//noinspection NullableProblems
 		return (XClient<B>) super.trigger(parameter, actions);
 	}
 }

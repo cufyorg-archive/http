@@ -25,7 +25,6 @@ import org.cufy.http.connect.Caller;
 import org.cufy.http.connect.Client;
 import org.cufy.http.middleware.Middleware;
 import org.cufy.http.request.Request;
-import org.cufy.http.sink.Sink;
 import org.cufy.http.syntax.HTTPRegExp;
 import org.intellij.lang.annotations.Language;
 import org.intellij.lang.annotations.Pattern;
@@ -48,53 +47,6 @@ import java.util.function.UnaryOperator;
  */
 public interface XClient<B extends Body> extends Client<B> {
 	/**
-	 * <b>Copy</b>
-	 * <br>
-	 * Construct a new copy of the given {@code client}.
-	 *
-	 * @param client the client to copy.
-	 * @return a copy of the given {@code client}.
-	 * @throws NullPointerException if the given {@code client} is null.
-	 * @since 0.0.1 ~2021.04.08
-	 */
-	static Client<Body> copy(@NotNull XClient<?> client) {
-		return new AbstractXClient<>(client);
-	}
-
-	/**
-	 * <b>Copy</b>
-	 * <br>
-	 * Construct a new copy of the given {@code client}.
-	 *
-	 * @param context the context to be used by the client.
-	 * @param client  the client to copy.
-	 * @return a copy of the given {@code client}.
-	 * @throws NullPointerException if the given {@code context} or {@code client} is
-	 *                              null.
-	 * @since 0.0.1 ~2021.04.08
-	 */
-	static Client<Body> copy(@NotNull Context context, @NotNull Client<?> client) {
-		return new AbstractXClient<>(context, client);
-	}
-
-	/**
-	 * <b>Copy</b>
-	 * <br>
-	 * Construct a new copy of the given {@code client}.
-	 *
-	 * @param context the context to be used by the client.
-	 * @param handler the handler to be used by the client.
-	 * @param client  the client to copy.
-	 * @return a copy of the given {@code client}.
-	 * @throws NullPointerException if the given {@code context} or {@code client} or
-	 *                              {@code client} is null.
-	 * @since 0.0.1 ~2021.04.08
-	 */
-	static Client<Body> copy(@NotNull Context context, @NotNull Handler handler, @NotNull Client<?> client) {
-		return new AbstractXClient<>(context, handler, client);
-	}
-
-	/**
 	 * <b>Default</b>
 	 * <br>
 	 * Return a new client instance to be a placeholder if a the user has not specified a
@@ -105,7 +57,7 @@ public interface XClient<B extends Body> extends Client<B> {
 	 * @throws NullPointerException if the given {@code context} is null.
 	 * @since 0.0.1 ~2021.04.08
 	 */
-	static XClient<Body> defaultClient(@NotNull Context context) {
+	static XClient<Body> client(@NotNull Context context) {
 		return new AbstractXClient<>(context);
 	}
 
@@ -122,8 +74,22 @@ public interface XClient<B extends Body> extends Client<B> {
 	 *                              null.
 	 * @since 0.0.1 ~2021.04.08
 	 */
-	static XClient<Body> defaultClient(@NotNull Context context, @NotNull Handler handler) {
+	static XClient<Body> client(@NotNull Context context, @NotNull Handler handler) {
 		return new AbstractXClient<>(context, handler);
+	}
+
+	/**
+	 * <b>Copy</b>
+	 * <br>
+	 * Construct a new copy of the given {@code client}.
+	 *
+	 * @param client the client to copy.
+	 * @return a copy of the given {@code client}.
+	 * @throws NullPointerException if the given {@code client} is null.
+	 * @since 0.0.1 ~2021.04.08
+	 */
+	static Client<Body> client(@NotNull XClient<?> client) {
+		return new AbstractXClient<>(client);
 	}
 
 	/**
@@ -138,7 +104,7 @@ public interface XClient<B extends Body> extends Client<B> {
 	 *                              null.
 	 * @since 0.0.1 ~2021.04.08
 	 */
-	static XClient<Body> with(@NotNull Context context, @NotNull Request<?> request) {
+	static XClient<Body> client(@NotNull Context context, @NotNull Request<?> request) {
 		return new AbstractXClient<>(context, request);
 	}
 
@@ -155,7 +121,7 @@ public interface XClient<B extends Body> extends Client<B> {
 	 *                              {@code request} is null.
 	 * @since 0.0.1 ~2021.04.08
 	 */
-	static XClient<Body> with(@NotNull Context context, @NotNull Handler handler, @NotNull Request<?> request) {
+	static XClient<Body> client(@NotNull Context context, @NotNull Handler handler, @NotNull Request<?> request) {
 		return new AbstractXClient<>(context, handler, request);
 	}
 
@@ -163,12 +129,6 @@ public interface XClient<B extends Body> extends Client<B> {
 	@Override
 	default XClient<B> connect() {
 		return (XClient<B>) Client.super.connect();
-	}
-
-	@NotNull
-	@Override
-	default XClient<B> connect(Sink sink) {
-		return (XClient<B>) Client.super.connect(sink);
 	}
 
 	@NotNull
@@ -186,7 +146,6 @@ public interface XClient<B extends Body> extends Client<B> {
 	@NotNull
 	@Override
 	default <T> XClient<B> on(@NotNull Callback<Client<B>, T> callback, @Nullable Action<T> @NotNull ... actions) {
-		//noinspection NullableProblems
 		return (XClient<B>) Client.super.on(callback, actions);
 	}
 
@@ -211,66 +170,25 @@ public interface XClient<B extends Body> extends Client<B> {
 	@NotNull
 	@Override
 	default <T> XClient<B> ont(@NotNull Callback<Client<B>, T> callback, @Nullable Action<T> @NotNull ... actions) {
-		//noinspection NullableProblems
 		return (XClient<B>) Client.super.ont(callback, actions);
 	}
 
 	@NotNull
 	@Override
-	default <BB extends Body> XClient<BB> request(@NotNull Request<BB> request) {
-		return (XClient<BB>) Client.super.request(request);
+	default <BB extends Body> XClient<BB> setRequest(@NotNull Request<BB> request) {
+		return (XClient<BB>) Client.super.setRequest(request);
+	}
+
+	@NotNull
+	@Override
+	default XClient<Body> setRequest(@NotNull @NonNls @Pattern(HTTPRegExp.REQUEST) String request) {
+		return (XClient<Body>) Client.super.setRequest(request);
 	}
 
 	@NotNull
 	@Override
 	default <BB extends Body> XClient<BB> request(@NotNull Function<Request<B>, Request<BB>> operator) {
 		return (XClient<BB>) Client.super.request(operator);
-	}
-
-	@NotNull
-	@Override
-	default XClient<Body> request(@NotNull @NonNls @Pattern(HTTPRegExp.REQUEST) String request) {
-		return (XClient<Body>) Client.super.request(request);
-	}
-
-	@NotNull
-	@Override
-	default <T> XClient<B> trigger(@NotNull Sink sink, @NotNull Action<T> action, @Nullable T parameter) {
-		return (XClient<B>) Client.super.trigger(sink, action, parameter);
-	}
-
-	@NotNull
-	@Override
-	default XClient<B> trigger(@NotNull Sink sink, @NotNull @NonNls String trigger, @Nullable Object parameter) {
-		return (XClient<B>) Client.super.trigger(sink, trigger, parameter);
-	}
-
-	@NotNull
-	@Override
-	default <T> XClient<B> trigger(@NotNull Sink sink, @Nullable T parameter, @Nullable Action<T> @NotNull ... actions) {
-		//noinspection NullableProblems
-		return (XClient<B>) Client.super.trigger(sink, parameter, actions);
-	}
-
-	@NotNull
-	@Override
-	default XClient<B> trigger(@NotNull Sink sink, @Nullable Object parameter, @Nullable @NonNls String @NotNull ... triggers) {
-		//noinspection NullableProblems
-		return (XClient<B>) Client.super.trigger(sink, parameter, triggers);
-	}
-
-	/**
-	 * Set the context used by this to the given {@code context}.
-	 *
-	 * @param context the new context to be set.
-	 * @return this.
-	 * @throws NullPointerException if the given {@code context} is null.
-	 * @since 0.0.1 ~2021.04.08
-	 */
-	@NotNull
-	@Contract(value = "_->this", mutates = "this")
-	default XClient<B> context(@NotNull Context context) {
-		throw new UnsupportedOperationException("context");
 	}
 
 	/**
@@ -293,27 +211,13 @@ public interface XClient<B extends Body> extends Client<B> {
 	@Contract(value = "_->this", mutates = "this")
 	default XClient<B> context(@NotNull UnaryOperator<Context> operator) {
 		Objects.requireNonNull(operator, "operator");
-		Context c = this.context();
+		Context c = this.getContext();
 		Context context = operator.apply(c);
 
 		if (context != null && context != c)
-			this.context(context);
+			this.setContext(context);
 
 		return this;
-	}
-
-	/**
-	 * Set the handler used by this to the given {@code handler}.
-	 *
-	 * @param handler the new handler to be set.
-	 * @return this.
-	 * @throws NullPointerException if the given {@code handler} is null.
-	 * @since 0.0.1 ~2021.04.08
-	 */
-	@NotNull
-	@Contract(value = "_->this", mutates = "this")
-	default XClient<B> handler(@NotNull Handler handler) {
-		throw new UnsupportedOperationException("handler");
 	}
 
 	/**
@@ -336,11 +240,11 @@ public interface XClient<B extends Body> extends Client<B> {
 	@Contract(value = "_->this", mutates = "this")
 	default XClient<B> handler(@NotNull UnaryOperator<Handler> operator) {
 		Objects.requireNonNull(operator, "operator");
-		Handler h = this.handler();
+		Handler h = this.getHandler();
 		Handler handler = operator.apply(h);
 
 		if (handler != null && handler != h)
-			this.handler(handler);
+			this.setHandler(handler);
 
 		return this;
 	}
@@ -366,7 +270,7 @@ public interface XClient<B extends Body> extends Client<B> {
 		Objects.requireNonNull(action, "action");
 		Objects.requireNonNull(callback, "callback");
 		return this.on(action, (caller, parameter) ->
-				this.handler().post(() -> {
+				this.getHandler().post(() -> {
 					try {
 						callback.call((XClient<B>) caller, parameter);
 					} catch (Throwable throwable) {
@@ -396,7 +300,7 @@ public interface XClient<B extends Body> extends Client<B> {
 		Objects.requireNonNull(regex, "regex");
 		Objects.requireNonNull(callback, "callback");
 		return this.on(Object.class, regex, (caller, parameter) ->
-				this.handler().post(() -> {
+				this.getHandler().post(() -> {
 					try {
 						callback.call((XClient<B>) caller, parameter);
 					} catch (Throwable throwable) {
@@ -429,7 +333,7 @@ public interface XClient<B extends Body> extends Client<B> {
 		Objects.requireNonNull(regex, "regex");
 		Objects.requireNonNull(callback, "callback");
 		return this.on(type, regex, (caller, parameter) ->
-				this.handler().post(() -> {
+				this.getHandler().post(() -> {
 					try {
 						callback.call((XClient<B>) caller, parameter);
 					} catch (Throwable throwable) {
@@ -469,6 +373,34 @@ public interface XClient<B extends Body> extends Client<B> {
 		return this;
 	}
 
+	/**
+	 * Set the context used by this to the given {@code context}.
+	 *
+	 * @param context the new context to be set.
+	 * @return this.
+	 * @throws NullPointerException if the given {@code context} is null.
+	 * @since 0.0.1 ~2021.04.08
+	 */
+	@NotNull
+	@Contract(value = "_->this", mutates = "this")
+	default XClient<B> setContext(@NotNull Context context) {
+		throw new UnsupportedOperationException("context");
+	}
+
+	/**
+	 * Set the handler used by this to the given {@code handler}.
+	 *
+	 * @param handler the new handler to be set.
+	 * @return this.
+	 * @throws NullPointerException if the given {@code handler} is null.
+	 * @since 0.0.1 ~2021.04.08
+	 */
+	@NotNull
+	@Contract(value = "_->this", mutates = "this")
+	default XClient<B> setHandler(@NotNull Handler handler) {
+		throw new UnsupportedOperationException("handler");
+	}
+
 	@NotNull
 	@Override
 	XClient<B> clone();
@@ -505,7 +437,7 @@ public interface XClient<B extends Body> extends Client<B> {
 	 */
 	@NotNull
 	@Contract(pure = true)
-	Context context();
+	Context getContext();
 
 	/**
 	 * Get the handler used by this client.
@@ -515,5 +447,5 @@ public interface XClient<B extends Body> extends Client<B> {
 	 */
 	@NotNull
 	@Contract(pure = true)
-	Handler handler();
+	Handler getHandler();
 }

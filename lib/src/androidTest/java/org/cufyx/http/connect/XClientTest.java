@@ -8,6 +8,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.cufy.http.middleware.OkHttpMiddleware;
+import org.cufy.http.uri.Port;
+import org.cufy.http.uri.Scheme;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,16 +47,18 @@ public class XClientTest {
 		Thread[] execThread = new Thread[1];
 
 		Object lock = new Object();
-		XClient.defaultClient(context)
-			   .middleware(OkHttpMiddleware.middleware())
+		XClient.client(context)
+			   .middleware(OkHttpMiddleware.okHttpMiddleware())
 			   .request(r -> r
-					   .uri("http://10.0.2.2/v2/items")
+					   .setScheme(Scheme.HTTPS)
+					   .setPort(Port.HTTPS)
+					   .setHost("example.com")
 			   )
 			   .onh("connected|disconnected", (client, object) -> {
 				   execThread[0] = Thread.currentThread();
 
 				   //PASS
-				   Toast.makeText(client.context(), object.toString(), Toast.LENGTH_LONG).show();
+				   Toast.makeText(client.getContext(), object.toString(), Toast.LENGTH_LONG).show();
 				   System.out.println("LALA_LAND: " + object);
 
 				   synchronized (lock) {
