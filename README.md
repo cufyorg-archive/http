@@ -24,17 +24,17 @@ dependencies {
 
 # Example
 
-```java 
-XClient.defaultClient(context)
+```java
+XClient.client(context)
     .request(r -> r
-        .uri("http://example.com")
+        .setUri("http://example.com")
     )
     .onh(Client.CONNECTED, (client, response) -> {
         //already in UI thread
-        Toast.makeText(client.context(), response.reasonPhrase().toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(client.getContext(), response.getReasonPhrase().toString(), Toast.LENGTH_LONG).show();
     })
     .onh(Client.DISCONNECTED, (client, exception) -> {
-        Toast.makeText(client.context(), exception.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(client.getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
     })
     .connect();
 ```

@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.cufy.http.connect.Client;
 import org.cufy.http.middleware.OkHttpMiddleware;
 import org.cufy.http.uri.Port;
 import org.cufy.http.uri.Scheme;
@@ -35,6 +36,26 @@ public class XClientTest {
 			lock.wait();
 			return uiThread[0];
 		}
+	}
+
+	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
+	@Test
+	public void specs() {
+		// Context of the app under test.
+		Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+		XClient.client(context)
+			   .request(r -> r
+					   .setUri("http://example.com")
+			   )
+			   .onh(Client.CONNECTED, (client, response) -> {
+				   //already in UI thread
+				   Toast.makeText(client.getContext(), response.getReasonPhrase().toString(), Toast.LENGTH_LONG).show();
+			   })
+			   .onh(Client.DISCONNECTED, (client, exception) -> {
+				   Toast.makeText(client.getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+			   })
+			   .connect();
 	}
 
 	@SuppressWarnings("MigrateAssertToMatcherAssert")
